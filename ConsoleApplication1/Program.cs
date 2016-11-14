@@ -10,6 +10,46 @@ namespace ConsoleApplication1
     {
 
 
+        public static int pcAssemblyRec(int[,] time, int[,] change, int[] entry, int[] exit, int n, int line)
+        {
+            if (n == 0)
+            {
+                return entry[line] + time[line,0];
+            }
+
+            int T0 = 10000;
+            int T1 = 10000;
+            int T2 = 10000;
+            if (line == 0)
+            {
+                T0 = min(pcAssemblyRec(time, change, entry, exit, n - 1, 0) + time[0,n],
+                                    pcAssemblyRec(time, change, entry, exit, n - 1, 1) + change[2, n] + time[0, n],
+                                    pcAssemblyRec(time, change, entry, exit, n - 1, 2) + change[4, n] + time[0, n]);
+            }
+            else if (line == 1)
+            {
+                T1 = min(pcAssemblyRec(time, change, entry, exit, n - 1, 1) + time[1, n],
+                                    pcAssemblyRec(time, change, entry, exit, n - 1, 0) + change[0, n] + time[1, n],
+                                    pcAssemblyRec(time, change, entry, exit, n - 1, 2) + change[5, n] + time[1, n]);
+            }
+            else if (line == 2)
+            {
+                T2 = min(pcAssemblyRec(time, change, entry, exit, n - 1, 2) + time[2, n],
+                                    pcAssemblyRec(time, change, entry, exit, n - 1, 0) + change[1, n] + time[2, n],
+                                    pcAssemblyRec(time, change, entry, exit, n - 1, 1) + change[3, n] + time[2, n]);
+            }
+
+            return min(T0, T1, T2);
+        }
+
+        public static int recursive_scheduling(int[,] time, int[,] change, int[] entry, int[] exit) { 
+            int x = pcAssemblyRec(time, change, entry, exit, 4, 0);
+            int y = pcAssemblyRec(time, change, entry, exit, 4, 1);
+            int z = pcAssemblyRec(time, change, entry, exit, 4, 2);
+            
+            return min(x+exit[0],y+exit[1],z+exit[2]);
+        }
+
         static void print(int[,] time, int[,] change, int[] entry, int[] exit) {
             Console.WriteLine("Total Lines: 3");
             Console.WriteLine("Total Stations: 5");
@@ -41,7 +81,7 @@ namespace ConsoleApplication1
                 Console.Write(exit[i] + "\t");
             }
 
-
+            Console.WriteLine("Change lane time: 1 details given in comments");
 
         }
         static int min(int a, int b, int c) { 
@@ -117,13 +157,15 @@ namespace ConsoleApplication1
             {
                 for (int j = 0; j < 5; j++)
                 {
-                    change[i, j] = new Random().Next(5, 20);
+                    change[i, j] = rand.Next(5, 20);
                 }
             }
 
             print(time, change, entry, exit);
-            int Min_time = iterative_scheduling(time,change,entry,exit);
-            Console.WriteLine(Min_time);
+            int Min_time_iterative = iterative_scheduling(time,change,entry,exit);
+
+            int Min_time_recursive = recursive_scheduling(time, change, entry, exit);
+            Console.WriteLine("\nTime With Iterative Solution:" + Min_time_iterative+ "\nTime with Recursive Solution" + Min_time_recursive);
 
             Console.ReadLine();
 
